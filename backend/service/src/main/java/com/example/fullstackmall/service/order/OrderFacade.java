@@ -1,10 +1,14 @@
 package com.example.fullstackmall.service.order;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.fullstackmall.contract.common.ApiCode;
+import com.example.fullstackmall.contract.common.PageResponse;
 import com.example.fullstackmall.contract.order.IOrderFacade;
 import com.example.fullstackmall.contract.order.OrderItemResponse;
+import com.example.fullstackmall.contract.order.OrderQueryRequest;
 import com.example.fullstackmall.contract.order.OrderResponse;
 import com.example.fullstackmall.contract.order.OrderStatus;
+import com.example.fullstackmall.contract.order.OrderSummaryResponse;
 import com.example.fullstackmall.service.common.exception.BusinessException;
 import com.example.fullstackmall.service.order.entity.OrderEntity;
 import com.example.fullstackmall.service.order.entity.OrderItemEntity;
@@ -80,6 +84,33 @@ public class OrderFacade implements IOrderFacade {
         return assembleOrder(orderDbService.requireByIdAndUserId(orderId, userId));
     }
 
+    @Override
+    public PageResponse<OrderSummaryResponse> queryAdminOrders(OrderQueryRequest request) {
+        Page<OrderEntity> entityPage = orderDbService.queryAdminPage(request);
+        List<OrderSummaryResponse> records = entityPage.getRecords()
+                .stream()
+                .map(this::toSummaryResponse)
+                .toList();
+        return new PageResponse<>(
+                entityPage.getCurrent(),
+                entityPage.getSize(),
+                entityPage.getTotal(),
+                entityPage.getPages(),
+                records
+        );
+    }
+
+    @Override
+    public OrderResponse queryAdminOrder(Long orderId) {
+        return assembleOrder(orderDbService.requireById(orderId));
+    }
+
+    @Override
+    public OrderResponse cancelAdminOrder(Long orderId) {
+        orderCancelTransactionService.cancelOrderByAdmin(orderId);
+        return assembleOrder(orderDbService.requireById(orderId));
+    }
+
     private void requireValidIdempotencyKey(String idempotencyKey) {
         if (idempotencyKey == null || !IDEMPOTENCY_KEY_PATTERN.matcher(idempotencyKey).matches()) {
             throw new BusinessException(
@@ -109,6 +140,22 @@ public class OrderFacade implements IOrderFacade {
                 .cancelledAt(order.getCancelledAt())
                 .closedAt(order.getClosedAt())
                 .build();
+    }
+
+    private OrderSummaryResponse toSummaryResponse(OrderEntity order) {
+        return new OrderSummaryResponse(
+                order.getId(),
+                order.getOrderNo(),
+                order.getUserId(),
+                OrderStatus.valueOf(order.getStatusCode()),
+                order.getTotalAmount(),
+                order.getCreatedAt(),
+                order.getUpdatedAt(),
+                order.getExpiresAt(),
+                order.getPaidAt(),
+                order.getCancelledAt(),
+                order.getClosedAt()
+        );
     }
 
     private OrderItemResponse toItemResponse(OrderItemEntity item) {

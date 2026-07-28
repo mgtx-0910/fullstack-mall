@@ -39,9 +39,22 @@ public class OrderCancelTransactionService {
     @Transactional(rollbackFor = Exception.class)
     public void cancelOrder(Long orderId, Long userId) {
         orderDbService.requireByIdAndUserId(orderId, userId);
+        cancelPendingOrder(orderId, () -> orderDbService.cancelPendingOrder(orderId, userId));
+    }
+
+    /**
+     * 管理员取消订单不校验用户归属，但仍复用同一套库存释放和支付关闭事务流程。
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelOrderByAdmin(Long orderId) {
+        orderDbService.requireById(orderId);
+        cancelPendingOrder(orderId, () -> orderDbService.cancelPendingOrderByAdmin(orderId));
+    }
+
+    private void cancelPendingOrder(Long orderId, java.util.function.IntSupplier cancelAction) {
         // 与支付回调保持统一锁顺序：支付行 → 订单行 → SKU 行，降低交叉死锁风险。
         paymentDbService.selectByOrderIdForUpdate(orderId);
-        int affectedRows = orderDbService.cancelPendingOrder(orderId, userId);
+        int affectedRows = cancelAction.getAsInt();
         if (affectedRows != 1) {
             throw conflict(ApiCode.ORDER_STATUS_CONFLICT);
         }

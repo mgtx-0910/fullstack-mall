@@ -28,6 +28,23 @@ public interface IProductFacade {
      * @return 商品摘要分页结果
      */
     PageResponse<ProductSummaryResponse> queryAdminProducts(ProductQueryRequest request);
+
+    /**
+     * 查询管理员商品详情；允许查看草稿、上架和下架商品。
+     *
+     * @param productId 商品主键
+     * @return 商品详情
+     */
+    ProductDetailResponse getAdminProduct(Long productId);
+
+    /**
+     * 管理员编辑商品基础信息；修改成功后需要让公开商品详情缓存失效。
+     *
+     * @param productId 商品主键
+     * @param request 新分类、标题和描述
+     * @return 修改后的商品详情
+     */
+    ProductDetailResponse updateProduct(Long productId, ProductUpdateRequest request);
     /**
      * 分页查询公开商品；服务端强制只返回 ON_SALE。
      *

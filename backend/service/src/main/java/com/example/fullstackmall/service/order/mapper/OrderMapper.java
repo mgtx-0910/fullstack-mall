@@ -23,6 +23,17 @@ public interface OrderMapper extends BaseMapper<OrderEntity> {
             """)
     OrderEntity selectByIdForUpdate(@Param("orderId") Long orderId);
 
+    /** 管理员取消任意待支付订单，不校验订单所属用户。 */
+    @Update("""
+            UPDATE mall_order
+            SET status_code = 'CANCELLED',
+                cancelled_at = CURRENT_TIMESTAMP(3),
+                updated_at = CURRENT_TIMESTAMP(3)
+            WHERE id = #{orderId}
+              AND status_code = 'PENDING_PAYMENT'
+            """)
+    int cancelPendingOrderByAdmin(@Param("orderId") Long orderId);
+
     /** 仅允许订单所有者把待支付订单原子更新为已取消。 */
     @Update("""
             UPDATE mall_order

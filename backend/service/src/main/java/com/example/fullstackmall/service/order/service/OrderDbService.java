@@ -1,12 +1,18 @@
 package com.example.fullstackmall.service.order.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.fullstackmall.contract.common.ApiCode;
+import com.example.fullstackmall.contract.order.OrderQueryRequest;
+import com.example.fullstackmall.contract.order.OrderStatus;
 import com.example.fullstackmall.service.common.exception.BusinessException;
 import com.example.fullstackmall.service.order.entity.OrderEntity;
 import com.example.fullstackmall.service.order.mapper.OrderMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +33,15 @@ public class OrderDbService extends ServiceImpl<OrderMapper, OrderEntity> {
                 .eq(OrderEntity::getUserId, userId).one();
     }
 
+    public OrderEntity requireById(Long orderId) {
+        OrderEntity order = getById(orderId);
+        if (order == null) {
+            throw new BusinessException(ApiCode.ORDER_NOT_FOUND,
+                    ApiCode.ORDER_NOT_FOUND.defaultMessage(), HttpStatus.NOT_FOUND);
+        }
+        return order;
+    }
+
     public OrderEntity requireByIdAndUserId(Long orderId, Long userId) {
         OrderEntity order = getByIdAndUserId(orderId, userId);
         if (order == null) {
@@ -34,6 +49,27 @@ public class OrderDbService extends ServiceImpl<OrderMapper, OrderEntity> {
                     ApiCode.ORDER_NOT_FOUND.defaultMessage(), HttpStatus.NOT_FOUND);
         }
         return order;
+    }
+
+    /**
+     * 管理员分页查询订单，允许按订单号、用户 ID 和状态筛选。
+     */
+    public Page<OrderEntity> queryAdminPage(OrderQueryRequest request) {
+        LambdaQueryWrapper<OrderEntity> wrapper = Wrappers.lambdaQuery(OrderEntity.class);
+        String orderNo = normalizeOrderNo(request.getOrderNo());
+        if (StringUtils.hasText(orderNo)) {
+            wrapper.like(OrderEntity::getOrderNo, orderNo);
+        }
+        if (request.getUserId() != null) {
+            wrapper.eq(OrderEntity::getUserId, request.getUserId());
+        }
+        OrderStatus status = request.getStatus();
+        if (status != null) {
+            wrapper.eq(OrderEntity::getStatusCode, status.name());
+        }
+        wrapper.orderByDesc(OrderEntity::getCreatedAt)
+                .orderByDesc(OrderEntity::getId);
+        return page(new Page<>(request.getPageNum(), request.getPageSize()), wrapper);
     }
 
     /**
@@ -52,6 +88,13 @@ public class OrderDbService extends ServiceImpl<OrderMapper, OrderEntity> {
     }
 
     /**
+     * 管理员只允许取消仍为待支付的订单；影响行数为 0 表示状态已变化。
+     */
+    public int cancelPendingOrderByAdmin(Long orderId) {
+        return baseMapper.cancelPendingOrderByAdmin(orderId);
+    }
+
+    /**
      * 仅允许 PENDING_PAYMENT → PAID，条件 UPDATE 可防止重复回调覆盖终态。
      */
     public int markPaid(Long orderId) {
@@ -63,6 +106,10 @@ public class OrderDbService extends ServiceImpl<OrderMapper, OrderEntity> {
      */
     public int closeExpiredOrder(Long orderId, LocalDateTime now) {
         return baseMapper.closeExpiredOrder(orderId, now);
+    }
+
+    private String normalizeOrderNo(String orderNo) {
+        return orderNo == null ? null : orderNo.trim();
     }
 
     /**

@@ -2,11 +2,17 @@ package com.example.fullstackmall.service.category;
 
 import com.example.fullstackmall.contract.category.CategoryDraftRequest;
 import com.example.fullstackmall.contract.category.CategoryDraftResponse;
+import com.example.fullstackmall.contract.category.CategorySummaryResponse;
 import com.example.fullstackmall.contract.category.ICategoryFacade;
 import com.example.fullstackmall.contract.common.ApiCode;
+import com.example.fullstackmall.service.category.entity.CategoryEntity;
+import com.example.fullstackmall.service.category.service.CategoryDbService;
 import com.example.fullstackmall.service.common.exception.BusinessException;
 
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 分类契约的业务实现。
@@ -15,6 +21,9 @@ import org.springframework.stereotype.Service;
 public class CategoryFacade implements ICategoryFacade {
 
     private static final String RESERVED_CATEGORY_NAME = "全部";
+
+    @Resource
+    private CategoryDbService categoryDbService;
 
     @Override
     public CategoryDraftResponse validateDraft(CategoryDraftRequest request) {
@@ -32,6 +41,24 @@ public class CategoryFacade implements ICategoryFacade {
                 normalizedName,
                 normalizedDescription,
                 request.getSortOrder()
+        );
+    }
+
+    @Override
+    public List<CategorySummaryResponse> listAdminCategories() {
+        return categoryDbService.listAdminCategories().stream()
+                .map(this::toSummaryResponse)
+                .toList();
+    }
+
+    private CategorySummaryResponse toSummaryResponse(CategoryEntity category) {
+        return new CategorySummaryResponse(
+                category.getId(),
+                category.getName(),
+                category.getStatus(),
+                category.getSortOrder(),
+                category.getCreatedAt(),
+                category.getUpdatedAt()
         );
     }
 

@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -20,6 +21,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.Map;
 
 @SpringBootTest(classes = FullstackMallApplication.class)
 @AutoConfigureMockMvc
@@ -136,5 +139,44 @@ class CategoryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string("X-Trace-Id", traceId))
                 .andExpect(jsonPath("$.traceId").value(traceId));
+    }
+    @Test
+    void shouldAllowAdminToListCategoriesInSortOrder() throws Exception {
+        String adminToken = loginAndGetToken("admin", "Admin123456");
+
+        mockMvc.perform(get("/api/admin/categories")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("SUCCESS"))
+                .andExpect(jsonPath("$.data[0].id").value(1))
+                .andExpect(jsonPath("$.data[0].name").value("手机数码"))
+                .andExpect(jsonPath("$.data[1].id").value(2))
+                .andExpect(jsonPath("$.data[2].id").value(3))
+                .andExpect(jsonPath("$.data[2].status").value(0));
+    }
+
+    @Test
+    void shouldProtectAdminCategoryList() throws Exception {
+        mockMvc.perform(get("/api/admin/categories"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+
+        String userToken = loginAndGetToken("xiaoming", "Mall123456");
+        mockMvc.perform(get("/api/admin/categories")
+                        .header("Authorization", "Bearer " + userToken))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+    }
+
+    private String loginAndGetToken(String username, String password) throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                Map.of("username", username, "password", password)
+                        )))
+                .andExpect(status().isOk())
+                .andReturn();
+        JsonNode body = objectMapper.readTree(result.getResponse().getContentAsString());
+        return body.path("data").path("accessToken").asText();
     }
 }

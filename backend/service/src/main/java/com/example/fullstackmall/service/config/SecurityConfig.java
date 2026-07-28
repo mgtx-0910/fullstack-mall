@@ -82,11 +82,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /** 只允许本地 Vue 开发服务器跨域访问，并显式声明可用请求头。 */
+    /** 只允许本地前端开发服务器跨域访问，并显式声明可用请求头。 */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:8000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of(
                 "Authorization", "Content-Type", "X-Trace-Id", "Idempotency-Key", "X-Mock-Payment-Secret"

@@ -1,5 +1,7 @@
 package com.example.fullstackmall.contract.order;
 
+import com.example.fullstackmall.contract.common.PageResponse;
+
 /**
  * 订单用例契约。
  */
@@ -28,4 +30,28 @@ public interface IOrderFacade {
      * @return 取消后的订单
      */
     OrderResponse cancelMyOrder(Long orderId);
+
+    /**
+     * 管理员分页查询订单列表。
+     *
+     * @param request 分页和筛选条件
+     * @return 订单摘要分页结果
+     */
+    PageResponse<OrderSummaryResponse> queryAdminOrders(OrderQueryRequest request);
+
+    /**
+     * 管理员查询任意订单详情。
+     *
+     * @param orderId 订单主键
+     * @return 订单及订单项快照
+     */
+    OrderResponse queryAdminOrder(Long orderId);
+
+    /**
+     * 管理员取消待支付订单，并在同一事务中释放库存和关闭待支付流水。
+     *
+     * @param orderId 订单主键
+     * @return 取消后的订单
+     */
+    OrderResponse cancelAdminOrder(Long orderId);
 }

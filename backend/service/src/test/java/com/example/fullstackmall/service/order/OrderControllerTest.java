@@ -200,6 +200,82 @@ class OrderControllerTest {
         assertThat(integer("SELECT locked_stock FROM mall_product_sku WHERE id = 1")).isZero();
     }
 
+
+    @Test
+    void adminCanListAndReadOrders() throws Exception {
+        String userToken = loginAndGetToken("xiaoming", "Mall123456");
+        long orderId = objectMapper.readTree(createOrder(userToken, "admin-list-001"))
+                .path("data")
+                .path("id")
+                .asLong();
+        String adminToken = loginAndGetToken("admin", "Admin123456");
+
+        mockMvc.perform(get("/api/admin/orders")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .param("status", "PENDING_PAYMENT"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("SUCCESS"))
+                .andExpect(jsonPath("$.data.total").value(1))
+                .andExpect(jsonPath("$.data.records[0].id").value(orderId))
+                .andExpect(jsonPath("$.data.records[0].userId").value(1))
+                .andExpect(jsonPath("$.data.records[0].status").value("PENDING_PAYMENT"));
+
+        mockMvc.perform(get("/api/admin/orders/{orderId}", orderId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(orderId))
+                .andExpect(jsonPath("$.data.items[0].productTitle").value("九成新 iPhone 15"));
+    }
+
+    @Test
+    void adminCanCancelPendingOrderAndReleaseStock() throws Exception {
+        String userToken = loginAndGetToken("xiaoming", "Mall123456");
+        long orderId = objectMapper.readTree(createOrder(userToken, "admin-cancel-001"))
+                .path("data")
+                .path("id")
+                .asLong();
+        String adminToken = loginAndGetToken("admin", "Admin123456");
+
+        mockMvc.perform(patch("/api/admin/orders/{orderId}/cancel", orderId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(orderId))
+                .andExpect(jsonPath("$.data.status").value("CANCELLED"));
+
+        assertThat(integer("SELECT available_stock FROM mall_product_sku WHERE id = 1")).isEqualTo(10);
+        assertThat(integer("SELECT locked_stock FROM mall_product_sku WHERE id = 1")).isZero();
+    }
+
+    @Test
+    void adminOrderEndpointsRequireAdminRole() throws Exception {
+        mockMvc.perform(get("/api/admin/orders"))
+                .andExpect(status().isUnauthorized());
+
+        String userToken = loginAndGetToken("xiaoming", "Mall123456");
+        mockMvc.perform(get("/api/admin/orders")
+                        .header("Authorization", "Bearer " + userToken))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void adminCancelReturnsConflictWhenOrderIsNotPending() throws Exception {
+        String userToken = loginAndGetToken("xiaoming", "Mall123456");
+        long orderId = objectMapper.readTree(createOrder(userToken, "admin-cancel-conflict-001"))
+                .path("data")
+                .path("id")
+                .asLong();
+        String adminToken = loginAndGetToken("admin", "Admin123456");
+
+        mockMvc.perform(patch("/api/admin/orders/{orderId}/cancel", orderId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(patch("/api/admin/orders/{orderId}/cancel", orderId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("ORDER_STATUS_CONFLICT"));
+    }
+
     private String createOrder(String token, String idempotencyKey) throws Exception {
         return mockMvc.perform(post("/api/orders")
                         .header("Authorization", "Bearer " + token)

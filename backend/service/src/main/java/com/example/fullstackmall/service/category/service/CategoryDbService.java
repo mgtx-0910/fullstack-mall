@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -36,6 +37,16 @@ public class CategoryDbService extends ServiceImpl<CategoryMapper, CategoryEntit
             throw categoryNotFound();
         }
         return category;
+    }
+
+    /**
+     * 后台列表展示全部分类，包括停用分类，并按运营排序稳定返回。
+     */
+    public List<CategoryEntity> listAdminCategories() {
+        return lambdaQuery()
+                .orderByAsc(CategoryEntity::getSortOrder)
+                .orderByAsc(CategoryEntity::getId)
+                .list();
     }
 
     private BusinessException categoryNotFound() {

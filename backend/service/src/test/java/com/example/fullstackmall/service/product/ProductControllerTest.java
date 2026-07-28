@@ -173,6 +173,69 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.data.records[0].status").value("DRAFT"));
     }
 
+
+    @Test
+    void shouldAllowAdminToReadDraftProductDetail() throws Exception {
+        String adminToken = loginAndGetToken("admin", "Admin123456");
+
+        mockMvc.perform(get("/api/admin/products/2")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(2))
+                .andExpect(jsonPath("$.data.title").value("Nintendo Switch OLED"))
+                .andExpect(jsonPath("$.data.status").value("DRAFT"));
+    }
+
+    @Test
+    void shouldAllowAdminToUpdateProductBasicInfo() throws Exception {
+        String adminToken = loginAndGetToken("admin", "Admin123456");
+
+        mockMvc.perform(patch("/api/admin/products/2")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "categoryId": 2,
+                                  "title": "  Switch OLED 国行  ",
+                                  "description": "  只拆封，配件齐全。  "
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(2))
+                .andExpect(jsonPath("$.data.categoryId").value(2))
+                .andExpect(jsonPath("$.data.categoryName").value("图书音像"))
+                .andExpect(jsonPath("$.data.title").value("Switch OLED 国行"))
+                .andExpect(jsonPath("$.data.description").value("只拆封，配件齐全。"));
+
+        ProductEntity updated = productDbService.getById(2L);
+        assertThat(updated.getCategoryId()).isEqualTo(2L);
+        assertThat(updated.getTitle()).isEqualTo("Switch OLED 国行");
+        assertThat(updated.getDescription()).isEqualTo("只拆封，配件齐全。");
+    }
+
+    @Test
+    void shouldRejectInvalidOrDisabledCategoryWhenUpdatingProduct() throws Exception {
+        String adminToken = loginAndGetToken("admin", "Admin123456");
+
+        mockMvc.perform(patch("/api/admin/products/2")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"categoryId": 0, "title": " ", "description": null}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+
+        mockMvc.perform(patch("/api/admin/products/2")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"categoryId": 3, "title": "禁用分类商品", "description": null}
+                                """))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("CATEGORY_NOT_FOUND"));
+    }
+
     private String loginAndGetToken(String username, String password) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

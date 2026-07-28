@@ -101,6 +101,27 @@ public class ProductFacade implements IProductFacade {
     }
 
     @Override
+    public ProductDetailResponse getAdminProduct(Long productId) {
+        ProductEntity product = productDbService.requireById(productId);
+        CategoryEntity category = categoryDbService.requireCategory(product.getCategoryId());
+        return toDetailResponse(product, category);
+    }
+
+    @Override
+    public ProductDetailResponse updateProduct(Long productId, ProductUpdateRequest request) {
+        CategoryEntity category = categoryDbService.requireEnabledCategory(request.getCategoryId());
+        ProductEntity product = productDbService.updateBasicInfo(
+                productId,
+                category.getId(),
+                request.getTitle().trim(),
+                normalizeOptionalText(request.getDescription())
+        );
+        // 基础信息会影响公开详情展示，数据库成功后必须让旧详情缓存失效。
+        productDetailCacheService.evict(productId);
+        return toDetailResponse(product, category);
+    }
+
+    @Override
     public ProductDetailResponse getPublishedProduct(Long productId) {
         ProductDetailCacheLookup cacheLookup = productDetailCacheService.lookup(productId);
         if (cacheLookup.getStatus() == ProductDetailCacheStatus.HIT) {

@@ -42,6 +42,27 @@ public class ProductAdminController {
                 .body(ApiResponse.success(response, TraceIdContext.get(servletRequest)));
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "管理员查询商品详情")
+    public ApiResponse<ProductDetailResponse> detail(
+            @PathVariable Long id,
+            HttpServletRequest servletRequest
+    ) {
+        ProductDetailResponse response = productFacade.getAdminProduct(id);
+        return ApiResponse.success(response, TraceIdContext.get(servletRequest));
+    }
+
+    @PatchMapping("/{id}")
+    @Operation(summary = "编辑商品基础信息")
+    public ApiResponse<ProductDetailResponse> updateProduct(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductUpdateRequest request,
+            HttpServletRequest servletRequest
+    ) {
+        ProductDetailResponse response = productFacade.updateProduct(id, request);
+        return ApiResponse.success(response, TraceIdContext.get(servletRequest));
+    }
+
     @PatchMapping("/{id}/status")
     @Operation(summary = "变更商品状态")
     public ApiResponse<ProductDetailResponse> changeStatus(

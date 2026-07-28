@@ -91,6 +91,23 @@ public class ProductDbService extends ServiceImpl<ProductMapper, ProductEntity> 
         return page(new Page<>(request.getPageNum(), request.getPageSize()), wrapper);
     }
 
+
+    public ProductEntity updateBasicInfo(Long productId, Long categoryId, String title, String description) {
+        LocalDateTime now = LocalDateTime.now();
+        LambdaUpdateWrapper<ProductEntity> wrapper = Wrappers.lambdaUpdate(ProductEntity.class)
+                .eq(ProductEntity::getId, productId)
+                .set(ProductEntity::getCategoryId, categoryId)
+                .set(ProductEntity::getTitle, title)
+                .set(ProductEntity::getDescription, description)
+                .set(ProductEntity::getUpdatedAt, now);
+
+        int affectedRows = baseMapper.update(null, wrapper);
+        if (affectedRows == 0) {
+            throw productNotFound();
+        }
+        return requireById(productId);
+    }
+
     private String normalizeKeyword(String keyword) {
         return keyword == null ? null : keyword.trim();
     }
@@ -102,13 +119,13 @@ public class ProductDbService extends ServiceImpl<ProductMapper, ProductEntity> 
                 HttpStatus.NOT_FOUND
         );
     }
-    public ProductEntity updateSubtitle(Long productId,String subtitle){
-        LocalDateTime now=LocalDateTime.now();
+    public ProductEntity updateSubtitle(Long productId, String subtitle) {
+        LocalDateTime now = LocalDateTime.now();
 
-        LambdaUpdateWrapper<ProductEntity> wrapper=Wrappers.lambdaUpdate(ProductEntity.class)
-                .eq(ProductEntity::getId,productId)
-                .set(ProductEntity::getSubtitle,subtitle)
-                .set(ProductEntity::getUpdatedAt,now);
+        LambdaUpdateWrapper<ProductEntity> wrapper = Wrappers.lambdaUpdate(ProductEntity.class)
+                .eq(ProductEntity::getId, productId)
+                .set(ProductEntity::getSubtitle, subtitle)
+                .set(ProductEntity::getUpdatedAt, now);
 
         int affectedRows = baseMapper.update(null, wrapper);
         if (affectedRows == 0) {
