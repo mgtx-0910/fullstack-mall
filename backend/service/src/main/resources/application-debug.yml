@@ -1,0 +1,6 @@
+# 调试专用配置。
+# 在 IDE Debug Configuration 中把 Active profiles 设置为 debug，
+# 或命令行添加 -Dspring-boot.run.profiles=debug，应用 HTTP 端口将默认使用 8081，避免和普通开发实例的 8080 冲突。
+
+server:
+  port: ${SERVER_PORT:8081}

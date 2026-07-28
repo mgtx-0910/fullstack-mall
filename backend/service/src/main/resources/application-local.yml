@@ -1,0 +1,27 @@
+# 本地无 Docker 快速启动配置。
+# 适用于只想先把后端服务跑起来、验证接口链路的场景；数据保存在内存中，应用重启后会重置。
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:fullstack_mall;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    druid:
+      initial-size: 1
+      min-idle: 1
+      max-active: 5
+      validation-query: SELECT 1
+      test-while-idle: true
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/local-schema.sql
+      data-locations: classpath:db/local-data.sql
+
+mall:
+  cache:
+    product-detail:
+      # local profile 默认不依赖本机 Redis，避免 Redis 未启动导致调试干扰。
+      enabled: false

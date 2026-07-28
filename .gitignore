@@ -1,0 +1,27 @@
+# Maven 构建产物
+**/target/
+
+# 为沙箱验证临时使用的项目内 Maven 依赖缓存
+backend/.m2-repository/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+.workflow/
+.trellis/
+.agents/
+.codex/
+# 本地环境变量和密钥文件
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
