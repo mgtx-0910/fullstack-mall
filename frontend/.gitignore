@@ -1,0 +1,12 @@
+node_modules
+.pnpm-home
+.pnpm-store
+.umi
+.umi-production
+src/.umi
+src/.umi-production
+dist
+coverage
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*

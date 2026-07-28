@@ -1,0 +1,33 @@
+{
+  "name": "fullstack-mall-admin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "fullstack-mall 管理后台，基于 Umi Max、Ant Design Pro 和 Zustand。",
+  "scripts": {
+    "dev": "max dev",
+    "start": "max dev",
+    "build": "max build",
+    "lint": "max lint",
+    "setup": "max setup",
+    "typecheck": "max setup && tsc --noEmit"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.5.2",
+    "@ant-design/pro-components": "^2.8.6",
+    "@umijs/max": "^4.4.0",
+    "antd": "^5.22.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.17",
+    "@types/react-dom": "^18.3.5",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
