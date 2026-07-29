@@ -1,4 +1,4 @@
-# fullstack-mall 管理后台
+# fullstack-mall 管理后台（精简版）
 
 精简版管理后台前端工程，基于 `Umi Max`、`React`、`Ant Design Pro`、`Ant Design` 和 `Zustand`。
 
@@ -18,11 +18,13 @@
 
 ### 1. 启动后端
 
-在项目根目录执行：
+如果只是本地学习和联调，推荐直接使用 `local` profile：
 
 ```bash
+# 终端 1：在项目根目录执行
 cd backend
-mvn -Dmaven.repo.local=$PWD/.m2-repository -pl service -am spring-boot:run
+mvn -Dmaven.repo.local=$PWD/.m2-repository -pl service -am -DskipTests package
+java -jar service/target/fullstack-mall-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=local
 ```
 
 后端默认监听 `http://localhost:8080`。
@@ -30,6 +32,7 @@ mvn -Dmaven.repo.local=$PWD/.m2-repository -pl service -am spring-boot:run
 ### 2. 安装前端依赖
 
 ```bash
+# 终端 2：在项目根目录执行
 cd frontend
 pnpm install
 ```
@@ -40,7 +43,7 @@ pnpm install
 pnpm dev
 ```
 
-Umi 默认监听 `http://localhost:8000`。前端开发代理已配置：
+前端默认监听 `http://localhost:8000`，登录页是：`http://localhost:8000/user/login`。前端开发代理已配置：
 
 ```ts
 '/api' -> 'http://localhost:8080'

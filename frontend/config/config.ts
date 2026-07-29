@@ -12,6 +12,7 @@ export default defineConfig({
     locale: false,
     ...defaultSettings,
   },
+  mfsu: false,
   routes,
   npmClient: 'pnpm',
   proxy: {
