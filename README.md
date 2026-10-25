@@ -10,12 +10,16 @@ fullstack-mall/
 │   ├── contract/             # 对外请求、响应、枚举和 Facade 接口定义
 │   └── service/              # Web Controller、业务实现、MyBatis-Plus、Redis 缓存等
 ├── sql/                     # MySQL 初始化建表和演示数据
+├── wiki/                    # GitHub Wiki 内容源（可直接同步到仓库 Wiki）
 ├── docker-compose.dev.yml   # 本地 MySQL + Redis 开发环境
+├── LEARNING_ROADMAP.md      # 学习路线（前端转全栈，对应专栏第 01～09 篇）
 ├── .gitignore
 └── README.md
 ```
 
-> 说明：本公开仓库没有包含个人开发记录、AI 工作区、IDE 配置、扩展学习文档等本地内容，只保留可运行的后端代码和数据库脚本。
+> 代码来源于原仓库 <https://github.com/2530622506/fullstack-mall>（掘金专栏《（前端转全栈）》示例项目）。
+> 本仓库在此基础上新增了 `LEARNING_ROADMAP.md` 学习路线和 `wiki/` 目录，作为学习过程中的笔记与导航。
+> 公开仓库中没有包含个人开发记录、AI 工作区、IDE 配置等本地内容。
 
 ## 技术栈
 
@@ -289,6 +293,37 @@ mvn -pl service -am \
   -Dsurefire.failIfNoSpecifiedTests=false \
   test
 ```
+
+## 学习路线（前端转全栈）
+
+如果你是前端工程师、第一次打开一个 Spring Boot 项目，建议按下面的顺序读，而不是从最复杂的订单 / 支付开始：
+
+```text
+Controller（HTTP 入口）
+  → I*Facade 接口（业务能力清单，在 backend/contract）
+  → *Facade 实现（业务编排，在 backend/service）
+  → CacheService / DbService（数据从哪来）
+  → Mapper / Entity（怎么落到表）
+  → sql/01_schema.sql（字段和约束到底是什么）
+```
+
+| 阶段 | 主题 | 核心文件 | 学完你能回答 |
+| --- | --- | --- | --- |
+| 0 | 环境与基础设施 | `docker-compose.dev.yml`、`sql/` | 后端为什么不能只靠一条命令跑起来 |
+| 1 | 工程地图 | `backend/pom.xml`、`contract/`、`service/` | `contract` 和 `service` 为什么分开 |
+| 2 | Maven / Spring Boot 启动 | `FullstackMallApplication.java`、`application.yml` | 服务是怎么跑起来并常驻的 |
+| 3 | Controller / Request / Response | `product/ProductController.java`、`contract/common/*` | Axios 请求进后端后被谁接住 |
+| 4 | MySQL 持久化 | `sql/01_schema.sql`、`entity/*Entity.java` | 为什么前端状态不够用 |
+| 5 | MyBatis-Plus | `*Mapper.java`、`*DbService.java` | 不手写一堆 SQL 怎么操作数据库 |
+| 6 | JWT / Spring Security | `auth/`、`security/`、`SecurityConfig.java` | 401 和 403 差在哪 |
+| 7 | Redis 缓存 | `cache/RedisOperatorClient.java`、`product/cache/*` | 改完商品为什么要删缓存 |
+| 8 | 商品详情完整链路 | `ProductFacade.java` + 上述各层 | 一次请求从 HTTP 到 JSON 经过了什么 |
+| 9 | 状态机 / 事务 / 幂等 | `ProductStatus`、`order/*TransactionService`、`payment/*` | 商品为什么不能随便上下架 |
+| 10 | 进阶：购物车 / 订单 / 支付 / 超时关单 | `cart/`、`order/OrderCloseScheduler.java` | 并发、重复请求、外部回调怎么兜住 |
+
+完整版见 **[LEARNING_ROADMAP.md](LEARNING_ROADMAP.md)**（对应掘金专栏《前端转全栈》第 01～09 篇，每篇都落到本仓库真实文件上）。
+
+配套 Wiki 内容在 **[wiki/](wiki/)** 目录，可直接作为仓库 Wiki 的内容源。
 
 ## 安全说明
 
