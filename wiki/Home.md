@@ -6,11 +6,11 @@
 
 ## 从哪开始
 
-1. 还没跑起来？先看 [02-Maven-SpringBoot](02-Maven-SpringBoot.md) 把服务跑起来，再回来读。
-2. 第一次打开后端项目？先看 [01-Project-Map](01-Project-Map.md)，建立工程地图。
-3. 想按篇学？按 [Roadmap](Roadmap.md) 的阶段 0 → 10 顺序走。
-4. 名词看不懂？查 [Glossary](Glossary.md)（前端 ↔ 后端术语对照）。
-5. 卡住了？看 [FAQ](FAQ.md)。
+1. 还没跑起来？先看 [02-Maven-SpringBoot](https://github.com/mgtx-0910/fullstack-mall/wiki/02-Maven-SpringBoot) 把服务跑起来，再回来读。
+2. 第一次打开后端项目？先看 [01-Project-Map](https://github.com/mgtx-0910/fullstack-mall/wiki/01-Project-Map)，建立工程地图。
+3. 想按篇学？按 [Roadmap](https://github.com/mgtx-0910/fullstack-mall/wiki/Roadmap) 的阶段 0 → 10 顺序走。
+4. 名词看不懂？查 [Glossary](https://github.com/mgtx-0910/fullstack-mall/wiki/Glossary)（前端 ↔ 后端术语对照）。
+5. 卡住了？看 [FAQ](https://github.com/mgtx-0910/fullstack-mall/wiki/FAQ)。
 
 ## 一条最重要的阅读规则
 
@@ -31,18 +31,18 @@ Controller → I*Facade → *Facade → CacheService / DbService → Mapper → 
 
 ## 目录
 
-- [Roadmap](Roadmap.md) —— 阶段 0～10 学习路线总表
-- [01 工程地图](01-Project-Map.md)
-- [02 Maven 与 Spring Boot 启动](02-Maven-SpringBoot.md)
-- [03 Controller / Request / Response](03-Controller-Request-Response.md)
-- [04 MySQL 持久化](04-MySQL-Persistence.md)
-- [05 MyBatis-Plus](05-MyBatis-Plus.md)
-- [06 JWT 与 Spring Security](06-JWT-Security.md)
-- [07 Redis 缓存](07-Redis-Cache.md)
-- [08 商品详情完整链路](08-Product-Detail-Pipeline.md)
-- [09 状态机 / 事务 / 幂等](09-State-Machine-Transaction.md)
-- [10 购物车 / 订单 / 支付](10-Cart-Order-Payment.md)
-- [Glossary 术语对照](Glossary.md)
-- [FAQ 常见问题](FAQ.md)
+- [Roadmap](https://github.com/mgtx-0910/fullstack-mall/wiki/Roadmap) —— 阶段 0～10 学习路线总表
+- [01 工程地图](https://github.com/mgtx-0910/fullstack-mall/wiki/01-Project-Map)
+- [02 Maven 与 Spring Boot 启动](https://github.com/mgtx-0910/fullstack-mall/wiki/02-Maven-SpringBoot)
+- [03 Controller / Request / Response](https://github.com/mgtx-0910/fullstack-mall/wiki/03-Controller-Request-Response)
+- [04 MySQL 持久化](https://github.com/mgtx-0910/fullstack-mall/wiki/04-MySQL-Persistence)
+- [05 MyBatis-Plus](https://github.com/mgtx-0910/fullstack-mall/wiki/05-MyBatis-Plus)
+- [06 JWT 与 Spring Security](https://github.com/mgtx-0910/fullstack-mall/wiki/06-JWT-Security)
+- [07 Redis 缓存](https://github.com/mgtx-0910/fullstack-mall/wiki/07-Redis-Cache)
+- [08 商品详情完整链路](https://github.com/mgtx-0910/fullstack-mall/wiki/08-Product-Detail-Pipeline)
+- [09 状态机 / 事务 / 幂等](https://github.com/mgtx-0910/fullstack-mall/wiki/09-State-Machine-Transaction)
+- [10 购物车 / 订单 / 支付](https://github.com/mgtx-0910/fullstack-mall/wiki/10-Cart-Order-Payment)
+- [Glossary 术语对照](https://github.com/mgtx-0910/fullstack-mall/wiki/Glossary)
+- [FAQ 常见问题](https://github.com/mgtx-0910/fullstack-mall/wiki/FAQ)
 
-仓库根目录还有一份 **[LEARNING_ROADMAP.md](https://github.com/2530622506/fullstack-mall/blob/main/LEARNING_ROADMAP.md)**，内容与该路线一致，方便离线阅读。
+仓库根目录还有一份 **[LEARNING_ROADMAP.md](https://github.com/mgtx-0910/fullstack-mall/blob/main/LEARNING_ROADMAP.md)**，内容与该路线一致，方便离线阅读。

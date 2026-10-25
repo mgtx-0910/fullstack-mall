@@ -46,7 +46,7 @@ Entity → ProductDetailResponse → ApiResponse(code/message/data/traceId) → 
 - 商品不存在返回什么业务码？（`PRODUCT_NOT_FOUND`）
 - 商品未上架能不能被公开访问？（不能，和不存在返回同一个结果）
 - 分类停用后商品还能展示吗？（不能，见 `CATEGORY_NOT_FOUND`）
-- 查 MySQL 慢的时候要不要走缓存？（要，见 [07 Redis](07-Redis-Cache.md)）
+- 查 MySQL 慢的时候要不要走缓存？（要，见 [07 Redis](https://github.com/mgtx-0910/fullstack-mall/wiki/07-Redis-Cache)）
 - Redis 挂了是失败还是降级？（降级回源）
 - 返回字段能直接把数据库所有字段暴露出去吗？（不能）
 - 一次请求怎么在日志里定位？（traceId）

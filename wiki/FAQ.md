@@ -50,7 +50,7 @@ Controller → `IProductFacade` → `ProductFacade` → 缓存 / DbService → M
 排查可用 `redis-cli keys 'mall:product:detail:v1:*'`。也可以临时把 `MALL_PRODUCT_CACHE_ENABLED` 设为 `false` 对比验证。
 
 **Q：Redis 挂了，商品详情会 500 吗？**
-不应该。缓存走 fail-open，Redis 不可用时回源 MySQL。详见 [07 Redis](07-Redis-Cache.md)。
+不应该。缓存走 fail-open，Redis 不可用时回源 MySQL。详见 [07 Redis](https://github.com/mgtx-0910/fullstack-mall/wiki/07-Redis-Cache)。
 
 **Q：怎么快速定位一次请求？**
 看响应头 `X-Trace-Id`，然后按这个 traceId 过滤服务日志。
